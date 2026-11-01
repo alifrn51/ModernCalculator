@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,15 +27,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.frn.moderncalculator.ui.theme.ModernCalculatorTheme
 
-
-private val viewModel = CalculatorViewModel()
-
 @Composable
-fun Calculator(modifier: Modifier = Modifier) {
+fun Calculator(
+    modifier: Modifier = Modifier,
+    viewModel: CalculatorViewModel = viewModel()
+) {
 
-    val state = viewModel.state.value
+    val state = viewModel.state.collectAsState()
 
     Column(
         modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -51,27 +53,69 @@ fun Calculator(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.End
         ) {
-            Text(
-                text = state.expression,
-                modifier = Modifier.fillMaxWidth(),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 36.sp,
-                textAlign = TextAlign.End,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-            Text(
-                text = state.result,
-                modifier = Modifier.fillMaxWidth(),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 17.sp,
-                textAlign = TextAlign.End,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
+
+            when(val currentState = state.value){
+                is ScreenState.Error -> {
+                    Text(
+                        text = currentState.expression,
+                        modifier = Modifier.fillMaxWidth(),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 36.sp,
+                        textAlign = TextAlign.End,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Text(
+                        text = "",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 17.sp,
+                        textAlign = TextAlign.End,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+                ScreenState.Initial -> {}
+                is ScreenState.Input -> {
+                    Text(
+                        text = currentState.expression,
+                        modifier = Modifier.fillMaxWidth(),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 36.sp,
+                        textAlign = TextAlign.End,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = currentState.result,
+                        modifier = Modifier.fillMaxWidth(),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 17.sp,
+                        textAlign = TextAlign.End,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+                is ScreenState.Success -> {
+                    Text(
+                        text = currentState.result,
+                        modifier = Modifier.fillMaxWidth(),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 36.sp,
+                        textAlign = TextAlign.End,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = "",
+                        modifier = Modifier.fillMaxWidth(),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 17.sp,
+                        textAlign = TextAlign.End,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
 
         }
 
         Column(
-            modifier = modifier.padding(start = 16.dp, end = 15.dp, bottom = 16.dp),
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
@@ -292,7 +336,7 @@ fun Calculator(modifier: Modifier = Modifier) {
                 CircleButton(
                     modifier = Modifier
                         .weight(1f)
-                        .aspectRatio(1f), text = ",",
+                        .aspectRatio(1f), text = ".",
                     onClick = {
                         viewModel.processCommand(CalculatorCommand.Input(Symbol.DOT))
                     }
@@ -329,7 +373,7 @@ private fun CalculatorPreview() {
 fun TextButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    size: Dp = 38.dp,
+    size: Dp = 44.dp,
     text: String,
     textColor: Color = MaterialTheme.colorScheme.onBackground
 ) {
@@ -345,11 +389,10 @@ fun TextButton(
         Text(
             text = text,
             fontWeight = FontWeight.Normal,
-            fontSize = 34.sp,
+            fontSize = 26.sp,
             color = textColor,
             textAlign = TextAlign.Center
         )
-
     }
 }
 
@@ -359,6 +402,7 @@ fun CircleButton(
     containerColor: Color = MaterialTheme.colorScheme.primary,
     textColor: Color = MaterialTheme.colorScheme.onBackground,
     text: String,
+    fontSize: Float = 28f,
     onClick: () -> Unit
 ) {
     Box(
@@ -371,8 +415,10 @@ fun CircleButton(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = text, fontWeight = FontWeight.Normal, fontSize = 40.sp, color = textColor
+            text = text,
+            fontWeight = FontWeight.Normal,
+            fontSize = fontSize.sp,
+            color = textColor
         )
-
     }
 }

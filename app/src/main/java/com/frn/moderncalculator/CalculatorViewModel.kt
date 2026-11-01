@@ -1,43 +1,46 @@
 package com.frn.moderncalculator
 
-import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlin.random.Random
 
-class CalculatorViewModel {
+class CalculatorViewModel : ViewModel() {
 
-    val state = mutableStateOf(
-        Display(
-            expression = "45*8",
-            result = "360"
-        )
+    private val _state: MutableStateFlow<ScreenState> = MutableStateFlow(
+        ScreenState.Initial
     )
+    val state = _state.asStateFlow()
 
-    fun processCommand(command: CalculatorCommand){
-        when(command){
+    fun processCommand(command: CalculatorCommand) {
+        when (command) {
             CalculatorCommand.Clear -> {
-                state.value = Display(
-                    expression = "",
-                    result = ""
-                )
+                _state.value = ScreenState.Initial
             }
+
             CalculatorCommand.Evaluate -> {
-
+                val isError = Random.nextBoolean()
+                _state.value = if (isError) {
+                    ScreenState.Error(expression = "100")
+                } else {
+                    ScreenState.Success(result = "100")
+                }
             }
+
             is CalculatorCommand.Input -> {
-
-            }
-        }
-    }
-    fun processInput(input: String){
-        when(input){
-            "AC" -> {
-                state.value = Display(
-                    expression = "",
-                    result = ""
-                )
+                _state.value = ScreenState.Input(expression = command.symbol.name, result = "100")
             }
         }
     }
 
+}
+
+sealed interface ScreenState {
+    data object Initial : ScreenState
+
+    data class Error(val expression: String) : ScreenState
+    data class Success(val result: String) : ScreenState
+    data class Input(val expression: String, val result: String) : ScreenState
 }
 
 data class Display(
@@ -45,13 +48,13 @@ data class Display(
     val result: String
 )
 
-sealed interface CalculatorCommand{
-    data object Clear: CalculatorCommand
-    data object Evaluate: CalculatorCommand
-    data class Input(val symbol: Symbol): CalculatorCommand
+sealed interface CalculatorCommand {
+    data object Clear : CalculatorCommand
+    data object Evaluate : CalculatorCommand
+    data class Input(val symbol: Symbol) : CalculatorCommand
 }
 
-enum class Symbol{
+enum class Symbol {
     DIGIT_0,
     DIGIT_1,
     DIGIT_2,
