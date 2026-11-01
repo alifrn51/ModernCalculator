@@ -12,9 +12,12 @@ class CalculatorViewModel : ViewModel() {
     )
     val state = _state.asStateFlow()
 
+    private var expression = ""
+
     fun processCommand(command: CalculatorCommand) {
         when (command) {
             CalculatorCommand.Clear -> {
+                expression = ""
                 _state.value = ScreenState.Initial
             }
 
@@ -28,12 +31,35 @@ class CalculatorViewModel : ViewModel() {
             }
 
             is CalculatorCommand.Input -> {
-                _state.value = ScreenState.Input(expression = command.symbol.name, result = "100")
+
+                val symbol = if(command.symbol != Symbol.PARENTHESIS){
+                    command.symbol.value
+                }else {
+                    getCorrectParenthesis()
+                }
+
+                expression += symbol
+
+                _state.value = ScreenState.Input(expression = expression, result = "100")
             }
         }
     }
+    private fun getCorrectParenthesis(): String{
 
+        val openCount = expression.count{it == '('}
+        val closeCount = expression.count{it == ')'}
+
+        return when{
+            expression.isEmpty() -> "("
+            !expression.last().isDigit() && expression.last() != ')' && expression.last() != 'π' -> "("
+            openCount > closeCount -> ")"
+            else -> "("
+        }
+
+    }
 }
+
+
 
 sealed interface ScreenState {
     data object Initial : ScreenState
@@ -54,26 +80,26 @@ sealed interface CalculatorCommand {
     data class Input(val symbol: Symbol) : CalculatorCommand
 }
 
-enum class Symbol {
-    DIGIT_0,
-    DIGIT_1,
-    DIGIT_2,
-    DIGIT_3,
-    DIGIT_4,
-    DIGIT_5,
-    DIGIT_6,
-    DIGIT_7,
-    DIGIT_8,
-    DIGIT_9,
-    ADD,
-    SUBTRACT,
-    MULTIPLY,
-    DIVIDE,
-    PERCENT,
-    POWER,
-    FACTORIAL,
-    SQRT,
-    PI,
-    DOT,
-    PARENTHESIS
+enum class Symbol(val value: String) {
+    DIGIT_0("0"),
+    DIGIT_1("1"),
+    DIGIT_2("2"),
+    DIGIT_3("3"),
+    DIGIT_4("4"),
+    DIGIT_5("5"),
+    DIGIT_6("6"),
+    DIGIT_7("7"),
+    DIGIT_8("8"),
+    DIGIT_9("9"),
+    ADD("+"),
+    SUBTRACT("-"),
+    MULTIPLY("*"),
+    DIVIDE("÷"),
+    PERCENT("%"),
+    POWER("^"),
+    FACTORIAL("!"),
+    SQRT("√"),
+    PI("π"),
+    DOT("."),
+    PARENTHESIS("()")
 }

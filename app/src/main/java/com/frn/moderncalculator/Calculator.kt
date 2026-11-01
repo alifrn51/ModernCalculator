@@ -60,6 +60,7 @@ fun Calculator(
                         text = currentState.expression,
                         modifier = Modifier.fillMaxWidth(),
                         fontWeight = FontWeight.SemiBold,
+                        lineHeight = 36.sp,
                         fontSize = 36.sp,
                         textAlign = TextAlign.End,
                         color = MaterialTheme.colorScheme.error
@@ -68,6 +69,7 @@ fun Calculator(
                         text = "",
                         modifier = Modifier.fillMaxWidth(),
                         fontWeight = FontWeight.SemiBold,
+                        lineHeight = 17.sp,
                         fontSize = 17.sp,
                         textAlign = TextAlign.End,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -79,6 +81,7 @@ fun Calculator(
                         text = currentState.expression,
                         modifier = Modifier.fillMaxWidth(),
                         fontWeight = FontWeight.SemiBold,
+                        lineHeight = 36.sp,
                         fontSize = 36.sp,
                         textAlign = TextAlign.End,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -87,6 +90,7 @@ fun Calculator(
                         text = currentState.result,
                         modifier = Modifier.fillMaxWidth(),
                         fontWeight = FontWeight.SemiBold,
+                        lineHeight = 17.sp,
                         fontSize = 17.sp,
                         textAlign = TextAlign.End,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -97,6 +101,7 @@ fun Calculator(
                         text = currentState.result,
                         modifier = Modifier.fillMaxWidth(),
                         fontWeight = FontWeight.SemiBold,
+                        lineHeight = 36.sp,
                         fontSize = 36.sp,
                         textAlign = TextAlign.End,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -105,6 +110,7 @@ fun Calculator(
                         text = "",
                         modifier = Modifier.fillMaxWidth(),
                         fontWeight = FontWeight.SemiBold,
+                        lineHeight = 17.sp,
                         fontSize = 17.sp,
                         textAlign = TextAlign.End,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
