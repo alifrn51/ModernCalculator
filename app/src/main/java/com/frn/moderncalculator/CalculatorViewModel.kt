@@ -3,6 +3,8 @@ package com.frn.moderncalculator
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.mariuszgromada.math.mxparser.Expression
+import org.mariuszgromada.math.mxparser.mathcollection.Evaluate
 import kotlin.random.Random
 
 class CalculatorViewModel : ViewModel() {
@@ -22,12 +24,16 @@ class CalculatorViewModel : ViewModel() {
             }
 
             CalculatorCommand.Evaluate -> {
-                val isError = Random.nextBoolean()
-                _state.value = if (isError) {
-                    ScreenState.Error(expression = "100")
-                } else {
-                    ScreenState.Success(result = "100")
+
+                val result = evaluate()
+                _state .value = if(result != null){
+                    ScreenState.Success(result = result)
+                }else{
+                    ScreenState.Error(expression = expression)
+                }.also {
+                    expression = ""
                 }
+
             }
 
             is CalculatorCommand.Input -> {
@@ -40,9 +46,15 @@ class CalculatorViewModel : ViewModel() {
 
                 expression += symbol
 
-                _state.value = ScreenState.Input(expression = expression, result = "100")
+                _state.value = ScreenState.Input(expression = expression, result = evaluate() ?: "")
             }
         }
+    }
+
+    private fun evaluate(): String? {
+        return Expression(expression.replace('X', '*'))
+            .calculate()
+            .takeIf { it.isFinite() }?.toString()
     }
     private fun getCorrectParenthesis(): String{
 
@@ -93,7 +105,7 @@ enum class Symbol(val value: String) {
     DIGIT_9("9"),
     ADD("+"),
     SUBTRACT("-"),
-    MULTIPLY("*"),
+    MULTIPLY("X"),
     DIVIDE("÷"),
     PERCENT("%"),
     POWER("^"),
